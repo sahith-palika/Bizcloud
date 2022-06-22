@@ -2,5 +2,5 @@
 
 ## Setting Up the yml file:
 
-- In line 11 edit the Function name to which you want to set up the Function name.
+- In line 11 edit the Function name to which you want to set up the Error alerts.
 - In line 50 edit the SNS Endpoint to the required email address.
