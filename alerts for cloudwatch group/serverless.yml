@@ -1,6 +1,11 @@
-
 service: alerts-cloudwatch
 frameworkVersion: '2.72.3'
+
+custom:
+  accountId:  AWS::AccountId
+  namesns: errors
+  lambda: error-log
+  log: '/aws/lambda/checking-test'
 
 provider:
   name: aws
@@ -12,25 +17,22 @@ provider:
       statements:
       - Effect: Allow
         Action: sns:Publish
-        Resource: arn:aws:sns:us-east-1:083868342691:errors
+        Resource: !Sub 'arn:aws:sns:us-east-1:${AWS::AccountId}:${self:custom.namesns}'
       - Effect: Allow
         Action: '*'
-        Resource: arn:aws:logs:us-east-1:083868342691:log-group:/aws/lambda/checking-test:*
+        Resource: !Sub 'arn:aws:lambda:us-east-1:${AWS::AccountId}:function:${self:custom.lambda}'
       - Effect: Allow
         Action: '*'
-        Resource: arn:aws:lambda:us-east-1:083868342691:function:error-log
-      - Effect: Allow
-        Action: '*'
-        Resource: arn:aws:logs:us-east-1:083868342691:log-group:/aws/lambda/checking-test:*
+        Resource: !Sub 'arn:aws:logs:us-east-1:${AWS::AccountId}:log-group:${self:custom.log}:*'
       
       
 functions:
   lambda_handler:
     handler: handler.lambda_handler
-    name: error-log
+    name: ${self:custom.lambda}
     events:
       - cloudwatchLog:
-          logGroup: '/aws/lambda/checking-test'
+          logGroup: ${self:custom.log}
           filter: '?ERROR ?WARN ?5xx'
     environment:
       ACCOUNT_ID: 083868342691
@@ -42,10 +44,11 @@ resources:
      snsTopic: 
        Type: AWS::SNS::Topic
        Properties:
-         TopicName: errors
+         TopicName: ${self:custom.namesns}
      MySnsSubscription:
        Type: AWS::SNS::Subscription
        Properties:
          Endpoint: sahith.palika@bizcloudexperts.com
          Protocol: email
          TopicArn: !Ref snsTopic
+
