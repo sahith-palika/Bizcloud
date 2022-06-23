@@ -35,8 +35,8 @@ functions:
           logGroup: ${self:custom.log}
           filter: '?ERROR ?WARN ?5xx'
     environment:
-      ACCOUNT_ID: ${AWS::AccountId}
-      snsARN: Sub! 'arn:aws:sns:us-east-1:${AWS::AccountId}:${self:custom.namesns}'
+      ACCOUNT_ID: !Sub ${AWS::AccountId}
+      snsARN: !Sub 'arn:aws:sns:us-east-1:${AWS::AccountId}:${self:custom.namesns}'
 
 
 resources:
